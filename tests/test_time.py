@@ -46,8 +46,6 @@ class TimesTestCase(unittest.TestCase):
                             .replace(microsecond=0)
                             .isoformat()).rsplit(':', 1)[0]
         t_iso_time = self.times.iso_time(self.times.current_time()).rsplit(':', 1)[0]
-        print(current_iso_time)
-        print(t_iso_time)
         self.assertEqual(current_iso_time, t_iso_time)
 
 
@@ -82,16 +80,12 @@ class TimesTestCase(unittest.TestCase):
     def test_interstellar_time_unix2gps(self):
         gps = self.gps_interstellar
         uni = self.unix_interstellar
-        iso = self.iso_interstellar
-        gex = self.hex_gps_interstellar
         self.assertEqual(gps, self.times.gps_time(uni, 'unix'))
 
 
     def test_interstellar_time_iso2gps(self):
         gps = self.gps_interstellar
-        uni = self.unix_interstellar
         iso = self.iso_interstellar
-        gex = self.hex_gps_interstellar
         self.assertEqual(gps, self.times.gps_time(iso, 'iso'))
 
 
@@ -118,10 +112,8 @@ class TimesTestCase(unittest.TestCase):
         self.assertEqual(uni, self.times.unix_time(gex, 'hexgps'))
 
     def test_interstellar_time_unix2iso(self):
-        gps = self.gps_interstellar
         uni = self.unix_interstellar
         iso = self.iso_interstellar
-        gex = self.hex_gps_interstellar
         self.assertEqual(iso, self.times.iso_time(uni, 'unix'))
 
     def test_interstellar_time_gps2iso(self):
@@ -145,8 +137,6 @@ class TimesTestCase(unittest.TestCase):
         self.assertEqual(gex, self.times.gpshex_time(gps, 'gps'))
 
     def test_interstellar_time_iso2hex(self):
-        gps = self.gps_interstellar
-        uni = self.unix_interstellar
         iso = self.iso_interstellar
         gex = self.hex_gps_interstellar
         self.assertEqual(gex, self.times.gpshex_time(iso, 'iso'))

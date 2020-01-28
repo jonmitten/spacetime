@@ -157,15 +157,12 @@ class Times:
                 try:
                     # convert to unix timestamp
                     dt = datetime.strptime(timestamp, self.iso_fmt)
-                    print(type(dt))
                     diff = self.dt_ticks()
                     # subtract ticks
                     gps_dt = (dt - diff).total_seconds()
-                    print(gps_dt)
                     return gps_dt
                 except TypeError as te:
                     dt = datetime.strptime(timestamp, self.iso_fmt)
-                    print(dt)
                     print('gps_time() had trouble converting {} from iso to gps timestamp:{}'.format(dt, te))
         elif fmt == 'hexgps' or fmt == 'gpshex':
             try:
