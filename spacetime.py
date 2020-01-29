@@ -4,7 +4,7 @@ import pytz
 import time
 
 from datetime import datetime
-
+from math import exp
 
 class Times:
 
@@ -37,7 +37,7 @@ class Times:
         elif isinstance(timestamp, datetime):
             return timestamp
 
-    def intstruct(self, timestamp):
+    def struct_time_to_int(self, timestamp):
         """
         Return a float formatted timestamp from a time.struct_time object.
         :param timestamp: time.struct_time object - the time to convert
@@ -149,7 +149,7 @@ class Times:
             elif isinstance(timestamp, float):
                 return self.whole_seconds(timestamp) - self.TICKS
             elif isinstance(timestamp, time.struct_time):
-                ts = self.intstruct(timestamp)
+                ts = self.struct_time_to_int(timestamp)
                 ts = self.whole_seconds(ts)
                 return ts - self.TICKS
         elif fmt == 'iso':
@@ -210,3 +210,27 @@ class Spaces:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='Process some times.')
         self.parser.add_argument('fmt', metavar='N', type=str, nargs='+', help='Return time in format provided.')
+
+    def twos_complement(self, value):
+        if value >= 1<<31: value -= 1<<32
+        return value
+
+    def hex_prefix(self, value):
+        return '0x' + value
+
+    def lat_hex_to_float(self, value):
+        lat_int = int(value, 16)
+        v = self.twos_complement(lat_int)
+        return round(self.lat_convert(v), 5)
+
+    def lat_convert(self, value):
+        return value * 180 / 2**25
+
+    def lng_hex_to_float(self, value):
+        lng_int = int(value, 16)
+        v = self.twos_complement(lng_int)
+        return round(self.lng_convert(v), 5)
+
+    def lng_convert(self, value):
+        return value * 180 / 2**25
+

@@ -9,6 +9,7 @@ verify_ssl = true
 parser = "*"
 python-dateutil = "*"
 pytz = "*"
+bitstring = "*"
 
 [requires]
 python_version = "3.7"
