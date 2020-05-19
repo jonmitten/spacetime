@@ -2,9 +2,11 @@ import argparse
 import calendar
 import pytz
 import time
+import bitstring
 
 from datetime import datetime
 from math import exp
+
 
 class Times:
 
@@ -14,6 +16,14 @@ class Times:
         self.parser.add_argument('fmt', metavar='N', type=str, nargs='+', help='Return time in format provided.')
         self.utc = pytz.timezone('UTC')
         self.iso_fmt = '%Y-%m-%dT%H:%M:%S'
+
+    def elapsed(self, start, end):
+        """
+        Return the number of seconds between the start and end times provided.
+
+        start and end must be integers.
+        """
+        return end - start
 
     def dt_ticks(self):
         return datetime.utcfromtimestamp(self.TICKS)
@@ -98,7 +108,10 @@ class Times:
         if fmt == 'gps':
             return timestamp + self.TICKS
         elif fmt == 'iso':
-            dt = datetime.strptime(timestamp, self.iso_fmt)
+            try:
+                dt = datetime.strptime(timestamp, self.iso_fmt)
+            except ValueError:
+                dt = datetime.strptime(timestamp.replace(' ', 'T'), self.iso_fmt)
             ts = (dt - datetime(1970, 1, 1)).total_seconds()
             return ts
         elif fmt == 'gpshex' or fmt == 'hexgps':
@@ -212,7 +225,7 @@ class Spaces:
         self.parser.add_argument('fmt', metavar='N', type=str, nargs='+', help='Return time in format provided.')
 
     def twos_complement(self, value):
-        if value >= 1<<31: value -= 1<<32
+        if value >= 1 << 31: value -= 1 << 32
         return value
 
     def hex_prefix(self, value):
@@ -224,7 +237,17 @@ class Spaces:
         return round(self.lat_convert(v), 5)
 
     def lat_convert(self, value):
-        return value * 180 / 2**25
+        return value * 180 / 2 ** 25
+
+    def deg_dec_to_hex(self, value):
+        # first multiply by 100000 and round to int
+        value = int(value * 100000)
+        deg_hex = bitstring.BitArray('int:32={}'.format(value)).hex
+        deg_hex = deg_hex.upper()
+        print(deg_hex)
+        return(deg_hex)
+
+
 
     def lng_hex_to_float(self, value):
         lng_int = int(value, 16)
@@ -232,5 +255,4 @@ class Spaces:
         return round(self.lng_convert(v), 5)
 
     def lng_convert(self, value):
-        return value * 180 / 2**25
-
+        return value * 180 / 2 ** 25
