@@ -2,7 +2,7 @@ import argparse
 import calendar
 import pytz
 import time
-import bitstring
+import binascii
 
 from datetime import datetime
 from math import exp
@@ -223,6 +223,7 @@ class Spaces:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='Process some times.')
         self.parser.add_argument('fmt', metavar='N', type=str, nargs='+', help='Return time in format provided.')
+        self.increments = (180 / 2**25)
 
     def twos_complement(self, value):
         if value >= 1 << 31: value -= 1 << 32
@@ -239,15 +240,23 @@ class Spaces:
     def lat_convert(self, value):
         return value * 180 / 2 ** 25
 
-    def deg_dec_to_hex(self, value):
-        # first multiply by 100000 and round to int
-        value = int(value * 100000)
-        deg_hex = bitstring.BitArray('int:32={}'.format(value)).hex
-        deg_hex = deg_hex.upper()
-        print(deg_hex)
-        return(deg_hex)
+
+    def twos_comp(self, val, bits=4):
+        if (val & (1 << (bits-1))) != 0:  # if sign bit is set (e.g., 8bit: 128-255)
+            val = val - (1 << bits)       # compute negative value
+        return val                        # return value as-is
 
 
+    def hexify(self, val, bits=4):
+        h = binascii.hexlify(val.to_bytes(bits, byteorder="big", signed=True))
+        return h
+
+
+    def convert_to_hex(self, val):
+        _val = int(round(val / self.increments, 0))
+        twos_complement = self.twos_comp(_val)
+        twos_hexify = self.hexify(twos_complement, 4)
+        return twos_hexify.decode("utf-8").upper()
 
     def lng_hex_to_float(self, value):
         lng_int = int(value, 16)
